@@ -1,3 +1,4 @@
+const articles = require('../db/data/test-data/articles');
 const model = require('../Model/model');
 
 module.exports.getTopics = (req, res, next) => {
@@ -17,5 +18,14 @@ module.exports.getArticleById = (req, res, next) => {
   }).catch((err) => {
     next(err);
   });
+};
+
+module.exports.getAllArticles = (req, res, next) => {
+  model.fetchAllArticles().then((response) => {
+    res.status(200).send(response);
+  })
+    .catch((err) => {
+      next(err);
+    });
 
 };
