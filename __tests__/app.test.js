@@ -5,6 +5,7 @@ const db = require('../db/connection');
 const app = require('../app');
 const seed = require('../db/seeds/seed');
 const data = require('../db/data/test-data/index');
+const articles = require("../db/data/test-data/articles");
 
 /* Set up your beforeEach & afterAll functions here */
 beforeEach(() => {
@@ -49,7 +50,6 @@ describe("GET/api/articles/:article_id", () => {
       .expect(200)
       .then((response) => {
         const { article } = response._body;
-        console.log(article);
         expect(typeof article).toBe('object');
         expect(Object.keys(article).length).not.toBe(0);
         expect(article.hasOwnProperty('author')).toBe(true);
@@ -76,6 +76,41 @@ describe("GET/api/articles/:article_id", () => {
       .expect(400)
       .then((response) => {
         expect(response._body.error).toBe('Bad request.');
+      });
+  });
+});
+
+describe("GET /api/articles", () => {
+  test('200 responds with an articles array of objects with correct properties', () => {
+    return request(app)
+      .get('/api/articles')
+      .expect(200)
+      .then((response) => {
+        const articles = response._body;
+        expect(articles.length).not.toBe(0);
+        articles.forEach(article => {
+          expect(typeof article).toBe('object');
+          expect(article.hasOwnProperty('author')).toBe(true);
+          expect(article.hasOwnProperty('title')).toBe(true);
+          expect(article.hasOwnProperty('article_id')).toBe(true);
+          expect(article.hasOwnProperty('topic')).toBe(true);
+          expect(article.hasOwnProperty('created_at')).toBe(true);
+          expect(article.hasOwnProperty('votes')).toBe(true);
+          expect(article.hasOwnProperty('article_img_url')).toBe(true);
+          expect(article.hasOwnProperty('comment_count')).toBe(true);
+          expect(article.hasOwnProperty('body')).toBe(false);
+        });
+
+      });
+  });
+  test('200 responds with a sorted by created_at array of objects in descending order', () => {
+    return request(app)
+      .get('/api/articles')
+      .expect(200)
+      .then((response) => {
+        const articles = response._body;
+        expect(articles.length).not.toBe(0);
+        expect(articles).toBeSortedBy('created_at', { descending: true, coerce: true });
       });
   });
 });

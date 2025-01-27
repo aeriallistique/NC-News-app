@@ -8,11 +8,11 @@ app.get('/api', (req, res) => {
 });
 
 app.get('/api/topics', controller.getTopics);
+app.get('/api/articles', controller.getAllArticles);
 app.get("/api/articles/:article_id", controller.getArticleById);
 
 
 app.use((err, req, res, next) => {
-  console.log(err, `INSIDE MIDDLEWARE`);
   if (err.message === "Article not found") {
     res.status(err.code).send({ error: err.message });
   } else {
