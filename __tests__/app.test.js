@@ -26,3 +26,21 @@ describe("GET /api", () => {
       });
   });
 });
+describe.only("GET /api/topics", () => {
+  test("200 responds with and array of topic objects", () => {
+    return request(app)
+      .get('/api/topics')
+      .expect(200)
+      .then((response) => {
+        const result = response._body.topics;
+        expect(Array.isArray(result)).toBe(true);
+        result.forEach(obj => {
+          expect(obj.hasOwnProperty('slug')).toBe(true);
+          expect(obj.hasOwnProperty('description')).toBe(true);
+        });
+
+
+      });
+
+  });
+});

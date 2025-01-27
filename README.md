@@ -1,7 +1,7 @@
 # Northcoders News API
 
 In order to successfully connect to the two databases locally
-please create a .env.test  and .env.development files and add in each, the correct PGDATABASE. See /db/setup.sql
+please create a .env.test  and .env.development files and add in each, the correct PGDATABASE. i.e nc_news_test and nc_news respectively.
 
 
 
