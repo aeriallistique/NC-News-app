@@ -1,6 +1,7 @@
 # Northcoders News API
 
-For instructions, please head over to [L2C NC News](https://l2c.northcoders.com/courses/be/nc-news).
+In order to successfully connect to the two databases locally
+please create a .env.test  and .env.development files and add in each, the correct PGDATABASE. See /db/setup.sql
 
 
 
