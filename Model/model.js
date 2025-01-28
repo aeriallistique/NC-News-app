@@ -1,5 +1,6 @@
 const { response } = require('../app');
 const db = require('../db/connection');
+const checkArticleIdExists = require('../db/seeds/utils');
 
 module.exports.fetchTopics = () => {
   let sqlString = "SELECT * FROM topics";
@@ -37,6 +38,22 @@ module.exports.fetchAllArticles = () => {
     } else {
       return response.rows;
     }
-
   });
+};
+
+module.exports.fetchAllCommentsByArticleId = (id) => {
+  const articleId = Number(id);
+  const values = [articleId];
+  //grabbing all the comments and checking if there are any comments with articleID
+  return db.query("SELECT article_id FROM comments").then((response) => {
+    const isCommentId = response.rows.some(comment => comment.article_id === articleId);
+    if (!isCommentId) { //no comments with articleID have been found
+      return Promise.reject({ message: 'No comment with article_id found', code: 404 });
+
+    } else { //if there are any comments with articleID then perform query to get all comments with that id
+      const values = [articleId];
+      return db.query(`SELECT comment_id, votes, created_at, author, body, article_id FROM comments WHERE comments.article_id= $1 ORDER BY comments.created_at DESC`, values).then((response) => { return response.rows; });
+    }
+  });
+  // I am aware this is not the most efficient way to do this but I am getting a hang test whenever I use the second sql string and for the last 18 hours I have not been able to find the issue with it.
 };

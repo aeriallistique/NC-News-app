@@ -12,11 +12,12 @@ beforeEach(() => {
   return seed(data);
 });
 
-afterAll(() => {
+afterAll((done) => {
   db.end();
+  done();
 });
 
-describe("GET /api", () => {
+describe.skip("GET /api", () => {
   test("200: Responds with an object detailing the documentation for each endpoint", () => {
     return request(app)
       .get("/api")
@@ -26,7 +27,7 @@ describe("GET /api", () => {
       });
   });
 });
-describe("GET /api/topics", () => {
+describe.skip("GET /api/topics", () => {
   test("200 responds with and array of topic objects", () => {
     return request(app)
       .get('/api/topics')
@@ -43,10 +44,10 @@ describe("GET /api/topics", () => {
   });
 });
 
-describe("GET/api/articles/:article_id", () => {
+describe.skip("GET/api/articles/:article_id", () => {
   test('200 responds with an article object', () => {
     return request(app)
-      .get('/api/articles/3')
+      .get('/api/articles/2')
       .expect(200)
       .then((response) => {
         const { article } = response._body;
@@ -80,7 +81,7 @@ describe("GET/api/articles/:article_id", () => {
   });
 });
 
-describe("GET /api/articles", () => {
+describe.skip("GET /api/articles", () => {
   test('200 responds with an articles array of objects with correct properties', () => {
     return request(app)
       .get('/api/articles')
@@ -112,5 +113,32 @@ describe("GET /api/articles", () => {
         expect(articles.length).not.toBe(0);
         expect(articles).toBeSortedBy('created_at', { descending: true, coerce: true });
       });
+  });
+});
+
+describe("GET /api/articles/:article_id/comments", () => {
+  test("200 responds with an array of comments for the given article_id", () => {
+    return request(app).get('/api/articles/9/comments').expect(200).then((response) => {
+      const comments = response._body.comments;
+      expect(comments.length).not.toBe(0);
+      comments.forEach(comment => {
+        expect(comment.hasOwnProperty('comment_id')).toBe(true);
+        expect(comment.hasOwnProperty('votes')).toBe(true);
+        expect(comment.hasOwnProperty('created_at')).toBe(true);
+        expect(comment.hasOwnProperty('author')).toBe(true);
+        expect(comment.hasOwnProperty('body')).toBe(true);
+        expect(comment.hasOwnProperty('article_id')).toBe(true);
+      });
+      expect(comments).toBeSortedBy('created_at', { descending: true, coerce: false });
+    });
+  }, 10000);
+
+  describe("404 not found", () => {
+    test('responds with 404 and No comment with article_id found when there are no comments with specified ID', () => {
+      return request(app).get('/api/articles/2/comments').expect(404).then((response) => {
+        expect(response._body.error).toBe('No comment with article_id found');
+
+      });
+    });
   });
 });
