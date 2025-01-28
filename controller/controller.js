@@ -1,3 +1,4 @@
+const { response } = require('../app');
 const articles = require('../db/data/test-data/articles');
 const model = require('../Model/model');
 
@@ -37,4 +38,14 @@ module.exports.getCommentsByArticleId = (req, res, next) => {
   }).catch((err) => [
     next(err)
   ]);
+};
+
+module.exports.postCommentForArticle = (req, res, next) => {
+  const id = req.params.article_id;
+  const { username, body } = req.body;
+  model.createComment({ id, username, body }).then((response) => {
+    res.status(201).send({ comment: response });
+  }).catch((err) => {
+    next(err);
+  });
 };

@@ -1,6 +1,6 @@
-const { response } = require('../app');
+const format = require('pg-format');
 const db = require('../db/connection');
-const checkArticleIdExists = require('../db/seeds/utils');
+const { checkArticleExists, checkUserExists } = require('../db/seeds/utils');
 
 module.exports.fetchTopics = () => {
   let sqlString = "SELECT * FROM topics";
@@ -14,19 +14,16 @@ module.exports.fetchTopics = () => {
 };
 
 module.exports.fetchArticleById = (id) => {
-  const article_id = id;
-
-  //i'm sure i need to add some conditional logic in here to sanitize the id but i'm not completely sure how that would be best done.
-  let sqlString = `SELECT author, title, article_id, body, topic, created_at, votes, article_img_url FROM articles JOIN topics ON articles.topic=topics.slug JOIN users ON articles.author=users.username WHERE articles.article_id='${article_id}'`;
-
-  return db.query(sqlString).then((response) => {
-
-    if (response.rowCount === 0) {
-      return Promise.reject({ message: "Article not found", code: 404 });
-    } else {
-      return response.rows;
-    }
-  });
+  if (isNaN(id)) { return Promise.reject({ message: 'Not a valid id', code: 400 }); }
+  let sqlString = format(`SELECT * FROM articles WHERE article_id= %L`, id);
+  return db.query(sqlString)
+    .then((response) => {
+      if (!response.rows.length) {
+        return Promise.reject({ message: "Article not found", code: 404 });
+      } else {
+        return response.rows;
+      }
+    });
 };
 
 module.exports.fetchAllArticles = () => {
@@ -35,25 +32,31 @@ module.exports.fetchAllArticles = () => {
   return db.query(sqlString).then((response) => {
     if (response.rowCount === 0) {
       return Promise.reject({ message: "No articles found." });
-    } else {
-      return response.rows;
-    }
+    } else { return response.rows; }
   });
 };
 
 module.exports.fetchAllCommentsByArticleId = (id) => {
-  const articleId = Number(id);
-  const values = [articleId];
-  //grabbing all the comments and checking if there are any comments with articleID
-  return db.query("SELECT article_id FROM comments").then((response) => {
-    const isCommentId = response.rows.some(comment => comment.article_id === articleId);
-    if (!isCommentId) { //no comments with articleID have been found
-      return Promise.reject({ message: 'No comment with article_id found', code: 404 });
+  return this.fetchArticleById(id)
+    .then((resp) => {
+      return db.query(`SELECT * FROM comments WHERE article_id= $1 ORDER BY created_at DESC`, [id]).then((response) => {
+        return response.rows;
+      });
+    });
+};
 
-    } else { //if there are any comments with articleID then perform query to get all comments with that id
-      const values = [articleId];
-      return db.query(`SELECT comment_id, votes, created_at, author, body, article_id FROM comments WHERE comments.article_id= $1 ORDER BY comments.created_at DESC`, values).then((response) => { return response.rows; });
-    }
-  });
-  // I am aware this is not the most efficient way to do this but I am getting a hang test whenever I use the second sql string and for the last 18 hours I have not been able to find the issue with it.
+module.exports.createComment = (query) => {
+  const { id, username, body } = query;
+  if (!id || !username || !body) { return Promise.reject({ message: "Missing fields in the request body", code: 400 }); }
+
+  return checkArticleExists(id)
+    .then(() => {
+      return checkUserExists(username);
+    }).then(() => {
+      let sqlString = "INSERT INTO comments(article_id, author, body) VALUES($1, $2, $3) RETURNING *;";
+      const values = [id, username, body];
+      return db.query(sqlString, values).then((response) => {
+        return response.rows[0];
+      });
+    });
 };

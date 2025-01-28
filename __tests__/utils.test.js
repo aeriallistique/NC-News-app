@@ -1,8 +1,10 @@
+const { response } = require("../app");
 const {
   convertTimestampToDate,
   createRef,
   formatComments,
-  checkArticleIdExists
+  checkArticleExists,
+  checkUserExists
 } = require("../db/seeds/utils");
 
 
@@ -103,4 +105,40 @@ describe("formatComments", () => {
     const formattedComments = formatComments(comments, {});
     expect(formattedComments[0].created_at).toEqual(new Date(timestamp));
   });
+});
+
+describe("checkArticleExists()", () => {
+  test("returns error message Category not found when passed in id that doesn't exist", () => {
+    return checkArticleExists(9999).catch((response) => {
+      expect(response.message).toBe('Article not found');
+      expect(response.code).toBe(404);
+    });
+  });
+  test("returns error message Not a valid id when passed something other than a number", () => {
+    const myId = 'id';
+    return checkArticleExists(myId).catch((error) => {
+      expect(error.message).toBe('Not a valid id');
+      expect(error.code).toBe(400);
+    });
+  });
+});
+
+describe("checkUserExists", () => {
+  test('function returns User not found is passed in an inexistent user', () => {
+    return checkUserExists('icellusedka').catch((error) => {
+      expect(error.message).toBe('User not found');
+      expect(error.code).toBe(404);
+    });
+  });
+  test("function returns Not a valid user input when passe anything other than a string", () => {
+    return checkUserExists(3).catch((error) => {
+      expect(error.message).toBe('Not a valid user input');
+    });
+  });
+  test("function returns Not a valid user input when passe anything other than a string", () => {
+    return checkUserExists(['user']).catch((error) => {
+      expect(error.message).toBe('Not a valid user input');
+    });
+  });
+
 });

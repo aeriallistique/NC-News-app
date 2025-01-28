@@ -92,7 +92,7 @@
       }
     ]
   },
-  "GET/api/articles/:article_id/comments": {
+  "GET /api/articles/:article_id/comments": {
     "description": "serves an array of comment objects sorted by date from the newest to oldest",
     "queries": [
       9
@@ -115,5 +115,19 @@
         "article_id": 9
       }
     ]
+  },
+  "POST /api/articles/:article_id/comments": {
+    "description": "serves an comment object based on provided article_id",
+    "queries": [
+      9
+    ],
+    "exampleResponse": {
+      "comment_id": 19,
+      "body": "Test comment, test-comment, test, TEST COMMENT, comment",
+      "article_id": 9,
+      "author": "icellusedkars",
+      "votes": 0,
+      "created_at": "2025-01-28T17: 34: 41.996Z"
+    }
   }
 }
