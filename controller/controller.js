@@ -27,5 +27,14 @@ module.exports.getAllArticles = (req, res, next) => {
     .catch((err) => {
       next(err);
     });
+};
 
+module.exports.getCommentsByArticleId = (req, res, next) => {
+  const article_id = req.params.article_id;
+
+  model.fetchAllCommentsByArticleId(article_id).then((response) => {
+    res.status(200).send({ comments: response });
+  }).catch((err) => [
+    next(err)
+  ]);
 };

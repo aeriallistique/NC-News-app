@@ -10,10 +10,11 @@ app.get('/api', (req, res) => {
 app.get('/api/topics', controller.getTopics);
 app.get('/api/articles', controller.getAllArticles);
 app.get("/api/articles/:article_id", controller.getArticleById);
+app.get('/api/articles/:article_id/comments', controller.getCommentsByArticleId);
 
 
 app.use((err, req, res, next) => {
-  if (err.message === "Article not found") {
+  if (err.message && err.code) {
     res.status(err.code).send({ error: err.message });
   } else {
     next(err);
