@@ -7,10 +7,20 @@ const seed = require('../db/seeds/seed');
 const data = require('../db/data/test-data/index');
 
 /* Set up your beforeEach & afterAll functions here */
-beforeEach(() => seed(data));
-afterAll(() => {
-  db.end();
+beforeEach(() => {
+  // console.log(`BEFORE EACH`);
+
+  return seed(data);
 });
+
+
+afterAll(() => {
+  // console.log(`AFTER ALL`);
+
+  return db.end();
+
+});
+
 
 describe("GET /api", () => {
   test("200: Responds with an object detailing the documentation for each endpoint", () => {
@@ -210,8 +220,6 @@ describe('PATCH api/articles/article_id', () => {
       .expect(201)
       .then((resp) => {
         const article = resp._body.article;
-        console.log(article);
-
         expect(typeof article).toBe('object');
         expect(article.votes).toBe(1);
         expect(article.hasOwnProperty('article_id')).toBe(true);
@@ -270,3 +278,31 @@ describe('PATCH api/articles/article_id', () => {
     });
   });
 });
+
+describe("DELETE /api/comments/:comment_id", () => {
+  test("204 endpoint deletes comment with specified comment_id", () => {
+    return request(app)
+      .delete('/api/comments/2')
+      .expect(204);
+
+  });
+  test("400 bad request endpoint if passed in a non number as comment_id", () => {
+    return request(app)
+      .delete('/api/comments/notId')
+      .expect(400)
+      .then((resp) => {
+        expect(resp._body.error).toBe('Not a valid id');
+      });
+  });
+
+  test("404 not found endpoint if passed an id for a comment that doesn't exist", () => {
+    return request(app)
+      .delete('/api/comments/888')
+      .expect(404)
+      .then((resp) => {
+        expect(resp._body.error).toBe('Comment not found');
+      });
+  });
+});
+
+

@@ -5,7 +5,8 @@ const {
   createRef,
   formatComments,
   checkArticleExists,
-  checkUserExists
+  checkUserExists,
+  checkCommentExists
 } = require("../db/seeds/utils");
 
 afterAll(() => db.end());
@@ -143,4 +144,17 @@ describe("checkUserExists", () => {
     });
   });
 
+});
+
+describe('checkCommentExists()', () => {
+  test("function returns Not a valid id when passed a non number id", () => {
+    return checkCommentExists('notNum').catch((error) => {
+      expect(error.message).toBe('Not a valid id');
+    });
+  });
+  test("function returns Comment not found when comment does not exist with passsed in id", () => {
+    return checkCommentExists(999).catch((error) => {
+      expect(error.message).toBe('Comment not found');
+    });
+  });
 });
