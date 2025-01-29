@@ -1,5 +1,3 @@
-const { response } = require('../app');
-const articles = require('../db/data/test-data/articles');
 const model = require('../Model/model');
 
 module.exports.getTopics = (req, res, next) => {
@@ -48,4 +46,11 @@ module.exports.postCommentForArticle = (req, res, next) => {
   }).catch((err) => {
     next(err);
   });
+};
+
+module.exports.updateArticleVote = (req, res, next) => {
+  const { inc_votes } = req.body;
+  const id = req.params.article_id;
+  model.updateArticleVote({ id, inc_votes });
+  res.status(201).send({ ok: 'all ok' });
 };

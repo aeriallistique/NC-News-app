@@ -8,7 +8,9 @@ const data = require('../db/data/test-data/index');
 
 /* Set up your beforeEach & afterAll functions here */
 beforeEach(() => seed(data));
-afterAll(() => db.end());
+afterAll(() => {
+  db.end();
+});
 
 describe("GET /api", () => {
   test("200: Responds with an object detailing the documentation for each endpoint", () => {
@@ -198,5 +200,19 @@ describe("POST /api/articles/:article_id/comments", () => {
     return request(app).post('/api/articles/999/comments').send(postObj).expect(404).then((error) => {
       expect(error._body.error).toBe('Article not found');
     });
+  });
+});
+
+describe.only('PATCH api/articles/article_id', () => {
+  test("201 endpoint successfully updates an article's votes", () => {
+    const patchObj = { inc_votes: 1 };
+    return request(app)
+      .patch('/api/articles/9')
+      .send(patchObj)
+      .expect(201)
+      .then((response) => {
+        console.log(response._body);
+
+      });
   });
 });

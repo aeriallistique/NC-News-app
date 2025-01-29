@@ -16,6 +16,8 @@ app.get('/api/articles/:article_id/comments', controller.getCommentsByArticleId)
 
 app.post('/api/articles/:article_id/comments', controller.postCommentForArticle);
 
+app.patch('/api/articles/:article_id', controller.updateArticleVote);
+
 app.use((err, req, res, next) => {
   if (err.message && err.code) {
     res.status(err.code).send({ error: err.message, code: err.code });
