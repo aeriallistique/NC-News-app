@@ -141,14 +141,22 @@ describe("GET /api/articles", () => {
     });
   });
   describe("400 responds with 'Prohibited query parameter' when passed an ineligible query parameter", () => {
-    test("400 responds with 'Prohibited query parameter' when passed sorty_by=notacolumn", () => {
+    test("400 responds with 'Prohibited query parameter' when passed sorty_by= notacolumn", () => {
       return request(app)
         .get('/api/articles?sort_by=notacolumn&order=ASC')
         .expect(400)
         .then((resp) => {
           expect(resp._body.error).toBe('Prohibited query parameter');
           expect(resp._body.code).toBe(400);
-
+        });
+    });
+    test("400 responds with 'Prohibited query parameter' when passed order=NOTASC", () => {
+      return request(app)
+        .get('/api/articles?sort_by=title&order=NOTASC')
+        .expect(400)
+        .then((resp) => {
+          expect(resp._body.error).toBe('Prohibited query parameter');
+          expect(resp._body.code).toBe(400);
         });
     });
   });
