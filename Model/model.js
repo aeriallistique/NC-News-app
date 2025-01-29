@@ -28,8 +28,15 @@ module.exports.fetchArticleById = (id) => {
     });
 };
 
-module.exports.fetchAllArticles = () => {
-  let sqlString = "SELECT articles.author, articles.title, articles.article_id, articles.topic, articles.created_at, articles.votes, articles.article_img_url, COUNT(comments.comment_id) AS comment_count FROM articles LEFT JOIN comments ON articles.article_id=comments.article_id GROUP BY articles.article_id ORDER BY articles.created_at DESC";
+module.exports.fetchAllArticles = (sort_by = 'created_at', order = 'DESC') => {
+  //greenlisting
+  const allowedQueries = { sort_by: ['author', 'title', 'article_id', 'topic', 'created_at', 'votes', 'article_img_url'], order: ['ASC', 'DESC'] };
+  const isSort_by = allowedQueries.sort_by.includes(sort_by);
+  const isOder = allowedQueries.order.includes(order);
+  //check if queries are within greenlist
+  if (!isOder || !isSort_by) { return Promise.reject({ message: 'Prohibited query parameter', code: 400 }); }
+
+  let sqlString = `SELECT articles.author, articles.title, articles.article_id, articles.topic, articles.created_at, articles.votes, articles.article_img_url, COUNT(comments.comment_id) AS comment_count FROM articles LEFT JOIN comments ON articles.article_id=comments.article_id GROUP BY articles.article_id ORDER BY articles.${sort_by} ${order}`;
 
   return db.query(sqlString).then((response) => {
     if (response.rowCount === 0) {

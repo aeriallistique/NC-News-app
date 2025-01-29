@@ -118,7 +118,102 @@ describe("GET /api/articles", () => {
         expect(articles).toBeSortedBy('created_at', { descending: true, coerce: true });
       });
   });
+
+  describe("200 responds with a sorted array by any valid column and ordered in descending order", () => {
+    test('200 reponds with a sorted array by title in descending order', () => {
+      return request(app)
+        .get('/api/articles?sort_by=title&order=DESC')
+        .expect(200)
+        .then((resp) => {
+          expect(resp._body.length).toBeGreaterThan(0);
+          expect(resp._body).toBeSortedBy('title', { descending: true });
+        });
+    });
+    test('200 reponds with a sorted array by votes in ascending order', () => {
+      return request(app)
+        .get('/api/articles?sort_by=votes&order=ASC')
+        .expect(200)
+        .then((resp) => {
+          console.log(`in the test`, resp._body);
+          expect(resp._body.length).toBeGreaterThan(0);
+          expect(resp._body).toBeSortedBy('votes', { descending: false });
+        });
+    });
+  });
+  describe("400 responds with 'Prohibited query parameter' when passed an ineligible query parameter", () => {
+    test("400 responds with 'Prohibited query parameter' when passed sorty_by= notacolumn", () => {
+      return request(app)
+        .get('/api/articles?sort_by=notacolumn&order=ASC')
+        .expect(400)
+        .then((resp) => {
+          expect(resp._body.error).toBe('Prohibited query parameter');
+          expect(resp._body.code).toBe(400);
+        });
+    });
+    test("400 responds with 'Prohibited query parameter' when passed order=NOTASC", () => {
+      return request(app)
+        .get('/api/articles?sort_by=title&order=NOTASC')
+        .expect(400)
+        .then((resp) => {
+          expect(resp._body.error).toBe('Prohibited query parameter');
+          expect(resp._body.code).toBe(400);
+        });
+    });
+  });
+
 });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 describe("GET /api/articles/:article_id/comments", () => {
   test("200 responds with an array of comments for the given article_id", () => {
