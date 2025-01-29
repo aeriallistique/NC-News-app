@@ -1,6 +1,7 @@
 const format = require('pg-format');
 const db = require('../db/connection');
 const { checkArticleExists, checkUserExists, checkCommentExists } = require('../db/seeds/utils');
+const { response } = require('../app');
 
 
 module.exports.fetchTopics = () => {
@@ -82,5 +83,14 @@ module.exports.deleteCommentById = (id) => {
       return db.query("DELETE FROM comments WHERE comment_id= $1", [id]);
     }).then(() => {
       return;
+    });
+};
+
+module.exports.fetchAllUsers = () => {
+  return db.query("SELECT * FROM users")
+    .then((response) => {
+      if (response.rows.length > 0) {
+        return response.rows;
+      } else { return Promise.reject({ message: 'No users found', code: 404 }); }
     });
 };

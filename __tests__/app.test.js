@@ -8,17 +8,12 @@ const data = require('../db/data/test-data/index');
 
 /* Set up your beforeEach & afterAll functions here */
 beforeEach(() => {
-  // console.log(`BEFORE EACH`);
-
   return seed(data);
 });
 
 
 afterAll(() => {
-  // console.log(`AFTER ALL`);
-
   return db.end();
-
 });
 
 
@@ -304,5 +299,24 @@ describe("DELETE /api/comments/:comment_id", () => {
       });
   });
 });
+
+describe.only("GET /api/users", () => {
+  test("GET all users", () => {
+    return request(app)
+      .get('/api/users')
+      .expect(200)
+      .then((resp) => {
+        expect(Array.isArray(resp._body)).toBe(true);
+        expect(resp._body.length).toBeGreaterThan(0);
+        resp._body.forEach(user => {
+          expect(typeof user).toBe('object');
+          expect(user.hasOwnProperty('username')).toBe(true);
+          expect(user.hasOwnProperty('name')).toBe(true);
+          expect(user.hasOwnProperty('avatar_url')).toBe(true);
+        });
+
+      });
+  });
+})
 
 
