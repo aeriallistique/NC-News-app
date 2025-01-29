@@ -1,4 +1,5 @@
-const { response } = require("../app");
+const db = require('../db/connection');
+const request = require('supertest');
 const {
   convertTimestampToDate,
   createRef,
@@ -7,6 +8,7 @@ const {
   checkUserExists
 } = require("../db/seeds/utils");
 
+afterAll(() => db.end());
 
 describe("convertTimestampToDate", () => {
   test("returns a new object", () => {

@@ -2,6 +2,7 @@ const format = require('pg-format');
 const db = require('../db/connection');
 const { checkArticleExists, checkUserExists } = require('../db/seeds/utils');
 
+
 module.exports.fetchTopics = () => {
   let sqlString = "SELECT * FROM topics";
   return db.query(sqlString).then(({ rows }) => {
@@ -59,4 +60,23 @@ module.exports.createComment = (query) => {
         return response.rows[0];
       });
     });
+};
+
+module.exports.updateArticleVote = (query) => {
+  const { id, inc_votes } = query;
+  if (!id || !inc_votes || typeof inc_votes !== 'number') {
+    return Promise.reject({ message: "Missing fields in the request body", code: 400 });
+  }
+
+
+
+  return checkArticleExists(id)
+    .then(() => {
+      let sqlString = "UPDATE articles SET votes = votes+ $1 WHERE article_id=$2 RETURNING *;";
+      const values = [inc_votes, id];
+      return db.query(sqlString, values);
+    }).then((response) => {
+      return response.rows[0];
+    });
+
 };
