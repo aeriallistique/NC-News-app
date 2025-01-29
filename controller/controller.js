@@ -21,7 +21,9 @@ module.exports.getArticleById = (req, res, next) => {
 };
 
 module.exports.getAllArticles = (req, res, next) => {
-  model.fetchAllArticles().then((response) => {
+  const { sort_by, order } = req.query;
+
+  model.fetchAllArticles(sort_by, order).then((response) => {
     res.status(200).send(response);
   })
     .catch((err) => {
