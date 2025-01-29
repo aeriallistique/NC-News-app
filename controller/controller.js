@@ -68,3 +68,12 @@ module.exports.deleteCommentById = (req, res, next) => {
       next(err);
     });
 };
+
+module.exports.getUsers = (req, res, next) => {
+  model.fetchAllUsers()
+    .then((response) => {
+      res.status(200).send(response);
+    }).catch((err) =>
+      next(err)
+    );
+};
