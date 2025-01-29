@@ -1,3 +1,4 @@
+const { response } = require('express');
 const model = require('../Model/model');
 
 module.exports.getTopics = (req, res, next) => {
@@ -55,5 +56,15 @@ module.exports.updateArticleVote = (req, res, next) => {
     .then((response) => {
       res.status(201).send({ article: response });
     }).catch((err) => next(err));
+};
 
+module.exports.deleteCommentById = (req, res, next) => {
+  const id = req.params.comment_id;
+
+  model.deleteCommentById(id)
+    .then((response) => {
+      res.status(204).send(response);
+    }).catch((err) => {
+      next(err);
+    });
 };

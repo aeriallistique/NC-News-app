@@ -1,6 +1,6 @@
 const format = require('pg-format');
 const db = require('../db/connection');
-const { checkArticleExists, checkUserExists } = require('../db/seeds/utils');
+const { checkArticleExists, checkUserExists, checkCommentExists } = require('../db/seeds/utils');
 
 
 module.exports.fetchTopics = () => {
@@ -67,16 +67,20 @@ module.exports.updateArticleVote = (query) => {
   if (!id || !inc_votes || typeof inc_votes !== 'number') {
     return Promise.reject({ message: "Missing fields in the request body", code: 400 });
   }
-
-
-
   return checkArticleExists(id)
     .then(() => {
-      let sqlString = "UPDATE articles SET votes = votes+ $1 WHERE article_id=$2 RETURNING *;";
-      const values = [inc_votes, id];
-      return db.query(sqlString, values);
+      return db.query("UPDATE articles SET votes = votes+ $1 WHERE article_id=$2 RETURNING *;", [inc_votes, id]);
     }).then((response) => {
       return response.rows[0];
     });
+};
 
+module.exports.deleteCommentById = (id) => {
+  //check comment exists, the utility function will handle any non number id's
+  return checkCommentExists(id)
+    .then(() => { //if exists perform db query
+      return db.query("DELETE FROM comments WHERE comment_id= $1", [id]);
+    }).then(() => {
+      return;
+    });
 };

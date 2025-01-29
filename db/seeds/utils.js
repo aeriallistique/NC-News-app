@@ -44,3 +44,14 @@ exports.checkUserExists = (user) => {
       } else { return; }
     });
 };
+
+exports.checkCommentExists = (id) => {
+  if (isNaN(id)) { { return Promise.reject({ message: 'Not a valid id', code: 400 }); } }
+  return db
+    .query("SELECT * FROM comments WHERE comment_id= $1", [id])
+    .then((response) => {
+      if (response.rows.length === 0) {
+        return Promise.reject({ message: 'Comment not found', code: 404 });
+      } else { return; }
+    });
+};
