@@ -163,8 +163,6 @@ describe("POST /api/articles/:article_id/comments", () => {
     const postObj = { username: "icellusedkars", body: "Test comment, test-comment, test, TEST COMMENT, comment" };
     return request(app).post('/api/articles/9/comments').send(postObj).expect(201).then((response) => {
       const comment = response._body.comment;
-      console.log(comment);
-
       expect(typeof comment).toBe('object');
       expect(comment.author).toEqual(postObj.username);
       expect(comment.body).toEqual(postObj.body);
@@ -203,16 +201,72 @@ describe("POST /api/articles/:article_id/comments", () => {
   });
 });
 
-describe.only('PATCH api/articles/article_id', () => {
+describe('PATCH api/articles/article_id', () => {
   test("201 endpoint successfully updates an article's votes", () => {
     const patchObj = { inc_votes: 1 };
     return request(app)
       .patch('/api/articles/9')
       .send(patchObj)
       .expect(201)
-      .then((response) => {
-        console.log(response._body);
+      .then((resp) => {
+        const article = resp._body.article;
+        console.log(article);
 
+        expect(typeof article).toBe('object');
+        expect(article.votes).toBe(1);
+        expect(article.hasOwnProperty('article_id')).toBe(true);
+        expect(article.hasOwnProperty('title')).toBe(true);
+        expect(article.hasOwnProperty('topic')).toBe(true);
+        expect(article.hasOwnProperty('author')).toBe(true);
+        expect(article.hasOwnProperty('body')).toBe(true);
+        expect(article.hasOwnProperty('created_at')).toBe(true);
+        expect(article.hasOwnProperty('article_img_url')).toBe(true);
       });
+  });
+
+  test("201 endpoint updated votes by provided amount", () => {
+    const patchObj = { inc_votes: 20 };
+    return request(app)
+      .patch('/api/articles/9')
+      .send(patchObj)
+      .expect(201)
+      .then((resp) => {
+        const article = resp._body.article;
+        expect(article.votes).toBe(20);
+      });
+  });
+  test("201 endpoint updates votes by provided negative amount", () => {
+    const patchObj = { inc_votes: -10 };
+    return request(app)
+      .patch('/api/articles/9')
+      .send(patchObj)
+      .expect(201)
+      .then((resp) => {
+        const article = resp._body.article;
+        expect(article.votes).toBe(-10);
+      });
+  });
+
+  describe("PATCH", () => {
+    test("400 endpoint responds with missing fields in request body", () => {
+      return request(app)
+        .patch('/api/articles/9')
+        .send({})
+        .expect(400)
+        .then((resp) => {
+          expect(resp._body.error).toBe('Missing fields in the request body');
+
+        });
+    });
+    test("400 endpoint responds with missing fields in request body", () => {
+      return request(app)
+        .patch('/api/articles/9')
+        .send({ inc_votes: 'notanumb' })
+        .expect(400)
+        .then((resp) => {
+          expect(resp._body.error).toBe('Missing fields in the request body');
+
+        });
+    });
   });
 });

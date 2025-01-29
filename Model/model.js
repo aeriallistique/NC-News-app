@@ -1,7 +1,7 @@
 const format = require('pg-format');
 const db = require('../db/connection');
 const { checkArticleExists, checkUserExists } = require('../db/seeds/utils');
-const { response } = require('../app');
+
 
 module.exports.fetchTopics = () => {
   let sqlString = "SELECT * FROM topics";
@@ -64,13 +64,19 @@ module.exports.createComment = (query) => {
 
 module.exports.updateArticleVote = (query) => {
   const { id, inc_votes } = query;
-  if (!id || !inc_votes) { return Promise.reject({ message: "Missing fields in the request body", code: 400 }); }
+  if (!id || !inc_votes || typeof inc_votes !== 'number') {
+    return Promise.reject({ message: "Missing fields in the request body", code: 400 });
+  }
+
+
 
   return checkArticleExists(id)
     .then(() => {
-      // console.log(`are we here????`);
-
-      // return db.query("UPDATE articles SET votes = votes+ $1 WHERE article_id=$2 RETURNING *;", [inc_votes, id]);
+      let sqlString = "UPDATE articles SET votes = votes+ $1 WHERE article_id=$2 RETURNING *;";
+      const values = [inc_votes, id];
+      return db.query(sqlString, values);
+    }).then((response) => {
+      return response.rows[0];
     });
 
 };

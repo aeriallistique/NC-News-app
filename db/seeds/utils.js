@@ -1,4 +1,4 @@
-const db = require('../connection');
+const db = require('../connection.js');
 
 
 exports.convertTimestampToDate = ({ created_at, ...otherProperties }) => {
@@ -26,8 +26,7 @@ exports.formatComments = (comments, idLookup) => {
 
 exports.checkArticleExists = (id) => {
   if (isNaN(id)) { return Promise.reject({ message: 'Not a valid id', code: 400 }); }
-  return db
-    .query("SELECT * FROM articles WHERE article_id= $1", [id])
+  return db.query("SELECT * FROM articles WHERE article_id= $1", [id])
     .then((response) => {
       if (response.rows.length === 0) {
         return Promise.reject({ message: 'Article not found', code: 404 });
