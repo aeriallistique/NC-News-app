@@ -28,17 +28,34 @@ module.exports.fetchArticleById = (id) => {
     });
 };
 
-module.exports.fetchAllArticles = (sort_by = 'created_at', order = 'DESC') => {
+
+module.exports.fetchAllArticles = ({ topic, sort_by = 'created_at', order = 'DESC' }) => {
   //greenlisting
-  const allowedQueries = { sort_by: ['author', 'title', 'article_id', 'topic', 'created_at', 'votes', 'article_img_url'], order: ['ASC', 'DESC'] };
+  const allowedQueries = {
+    sort_by: [
+      'author', 'title', 'article_id', 'topic', 'created_at', 'votes', 'article_img_url'],
+    order: [
+      'ASC', 'DESC'],
+    topic: ['mitch', 'cats', 'paper']
+  };
   const isSort_by = allowedQueries.sort_by.includes(sort_by);
   const isOder = allowedQueries.order.includes(order);
+  const isTopic = allowedQueries.topic.includes(topic);
   //check if queries are within greenlist
   if (!isOder || !isSort_by) { return Promise.reject({ message: 'Prohibited query parameter', code: 400 }); }
 
-  let sqlString = `SELECT articles.author, articles.title, articles.article_id, articles.topic, articles.created_at, articles.votes, articles.article_img_url, COUNT(comments.comment_id) AS comment_count FROM articles LEFT JOIN comments ON articles.article_id=comments.article_id GROUP BY articles.article_id ORDER BY articles.${sort_by} ${order}`;
 
-  return db.query(sqlString).then((response) => {
+  let sqlString = `SELECT articles.author, articles.title, articles.article_id, articles.topic, articles.created_at, articles.votes, articles.article_img_url, COUNT(comments.comment_id) AS comment_count FROM articles LEFT JOIN comments ON articles.article_id=comments.article_id`;
+
+  let queryParams = [];
+  if (isTopic) {
+    queryParams.push(topic);
+    sqlString += ` WHERE articles.topic= $${queryParams.length}`;
+  }
+  sqlString += ` GROUP BY articles.article_id ORDER BY ${sort_by} ${order};`;
+
+
+  return db.query(sqlString, queryParams).then((response) => {
     if (response.rowCount === 0) {
       return Promise.reject({ message: "No articles found." });
     } else { return response.rows; }

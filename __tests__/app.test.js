@@ -134,7 +134,6 @@ describe("GET /api/articles", () => {
         .get('/api/articles?sort_by=votes&order=ASC')
         .expect(200)
         .then((resp) => {
-          console.log(`in the test`, resp._body);
           expect(resp._body.length).toBeGreaterThan(0);
           expect(resp._body).toBeSortedBy('votes', { descending: false });
         });
@@ -161,51 +160,45 @@ describe("GET /api/articles", () => {
     });
   });
 
+  describe("200 endpoind should respond with filtered articles by topic", () => {
+    test("200 endpoint responds with filtered articles by topic = mitch", () => {
+      return request(app)
+        .get('/api/articles?topic=mitch')
+        .expect(200)
+        .then((resp) => {
+          expect(resp._body.length).not.toBe(0);
+          resp._body.forEach(article => {
+            expect(article.topic).toBe('mitch');
+          });
+        });
+    });
+    test("200 endpoint responds with filtered articles by topic = cats", () => {
+      return request(app)
+        .get('/api/articles?topic=cats')
+        .expect(200)
+        .then((resp) => {
+          expect(resp._body.length).not.toBe(0);
+          resp._body.forEach(article => {
+            expect(article.topic).toBe('cats');
+          });
+        });
+    });
+    describe("200 if passed invalid topic endpoint returns all articles", () => {
+      test("200 if passed invalid topic endpoint returns all articles", () => {
+        return request(app)
+          .get('/api/articles?topic=notValidTopic')
+          .expect(200)
+          .then((resp) => {
+            expect(resp._body.length).not.toBe(0);
+            const topicsArray = resp._body.map((article => article.topic));
+            expect(topicsArray.includes('mitch')).toBe(true);
+            expect(topicsArray.includes('cats')).toBe(true);
+          });
+      });
+    });
+  });
+
 });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -395,7 +388,7 @@ describe("DELETE /api/comments/:comment_id", () => {
   });
 });
 
-describe.only("GET /api/users", () => {
+describe("GET /api/users", () => {
   test("GET all users", () => {
     return request(app)
       .get('/api/users')
