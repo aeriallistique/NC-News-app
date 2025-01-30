@@ -135,7 +135,7 @@ describe("GET /api/articles", () => {
         .expect(200)
         .then((resp) => {
           expect(resp._body.length).toBeGreaterThan(0);
-          expect(resp._body).toBeSortedBy('votes', { descending: false });
+          expect(resp._body).toBeSortedBy('votes');
         });
     });
   });
