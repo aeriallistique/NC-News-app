@@ -1,27 +1,10 @@
 const express = require('express');
 const app = express();
-const endpoints = require('./endpoints.json');
-const controller = require('./controller/controller');
-
+const apiRouter = require('./routes/api-router');
 app.use(express.json());
 
-app.get('/api', (req, res) => {
-  res.status(200).send({ endpoints });
-});
+app.use("/api", apiRouter);
 
-app.get('/api/topics', controller.getTopics);
-app.get('/api/users', controller.getUsers);
-
-app.get('/api/articles', controller.getAllArticles);
-app.get("/api/articles/:article_id", controller.getArticleById);
-app.get('/api/articles/:article_id/comments', controller.getCommentsByArticleId);
-
-app.post('/api/articles/:article_id/comments', controller.postCommentForArticle);
-
-app.patch('/api/articles/:article_id', controller.updateArticleVote);
-
-
-app.delete('/api/comments/:comment_id', controller.deleteCommentById);
 
 
 app.use((err, req, res, next) => {
