@@ -34,7 +34,7 @@ describe("GET /api/topics", () => {
       .get('/api/topics')
       .expect(200)
       .then((response) => {
-        const topics = response._body.topics;
+        const topics = response.body.topics;
         expect(Array.isArray(topics)).toBe(true);
         expect(topics.length).not.toBe(0);
         topics.forEach(topic => {
@@ -51,7 +51,7 @@ describe("GET/api/articles/:article_id", () => {
       .get('/api/articles/2')
       .expect(200)
       .then((response) => {
-        const { article } = response._body;
+        const { article } = response.body;
         expect(typeof article).toBe('object');
         expect(Object.keys(article).length).not.toBe(0);
         expect(article.hasOwnProperty('author')).toBe(true);
@@ -69,7 +69,7 @@ describe("GET/api/articles/:article_id", () => {
       .get('/api/articles/3333')
       .expect(404)
       .then((response) => {
-        expect(response._body.error).toBe('Article not found');
+        expect(response.body.error).toBe('Article not found');
       });
   });
 
@@ -80,7 +80,7 @@ describe('404 not found', () => {
       .get('/api/articles/Id3')
       .expect(400)
       .then((response) => {
-        expect(response._body.error).toBe('Not a valid id');
+        expect(response.body.error).toBe('Not a valid id');
       });
   });
 });
@@ -91,7 +91,7 @@ describe("GET /api/articles", () => {
       .get('/api/articles')
       .expect(200)
       .then((response) => {
-        const articles = response._body;
+        const articles = response.body;
         expect(articles.length).not.toBe(0);
         articles.forEach(article => {
           expect(typeof article).toBe('object');
@@ -113,7 +113,7 @@ describe("GET /api/articles", () => {
       .get('/api/articles')
       .expect(200)
       .then((response) => {
-        const articles = response._body;
+        const articles = response.body;
         expect(articles.length).not.toBe(0);
         expect(articles).toBeSortedBy('created_at', { descending: true, coerce: true });
       });
@@ -125,8 +125,8 @@ describe("GET /api/articles", () => {
         .get('/api/articles?sort_by=title&order=DESC')
         .expect(200)
         .then((resp) => {
-          expect(resp._body.length).toBeGreaterThan(0);
-          expect(resp._body).toBeSortedBy('title', { descending: true });
+          expect(resp.body.length).toBeGreaterThan(0);
+          expect(resp.body).toBeSortedBy('title', { descending: true });
         });
     });
     test('200 reponds with a sorted array by votes in ascending order', () => {
@@ -134,8 +134,8 @@ describe("GET /api/articles", () => {
         .get('/api/articles?sort_by=votes&order=ASC')
         .expect(200)
         .then((resp) => {
-          expect(resp._body.length).toBeGreaterThan(0);
-          expect(resp._body).toBeSortedBy('votes', { descending: false });
+          expect(resp.body.length).toBeGreaterThan(0);
+          expect(resp.body).toBeSortedBy('votes');
         });
     });
   });
@@ -145,8 +145,8 @@ describe("GET /api/articles", () => {
         .get('/api/articles?sort_by=notacolumn&order=ASC')
         .expect(400)
         .then((resp) => {
-          expect(resp._body.error).toBe('Prohibited query parameter');
-          expect(resp._body.code).toBe(400);
+          expect(resp.body.error).toBe('Prohibited query parameter');
+          expect(resp.body.code).toBe(400);
         });
     });
     test("400 responds with 'Prohibited query parameter' when passed order=NOTASC", () => {
@@ -154,8 +154,8 @@ describe("GET /api/articles", () => {
         .get('/api/articles?sort_by=title&order=NOTASC')
         .expect(400)
         .then((resp) => {
-          expect(resp._body.error).toBe('Prohibited query parameter');
-          expect(resp._body.code).toBe(400);
+          expect(resp.body.error).toBe('Prohibited query parameter');
+          expect(resp.body.code).toBe(400);
         });
     });
   });
@@ -166,8 +166,8 @@ describe("GET /api/articles", () => {
         .get('/api/articles?topic=mitch')
         .expect(200)
         .then((resp) => {
-          expect(resp._body.length).not.toBe(0);
-          resp._body.forEach(article => {
+          expect(resp.body.length).not.toBe(0);
+          resp.body.forEach(article => {
             expect(article.topic).toBe('mitch');
           });
         });
@@ -177,8 +177,8 @@ describe("GET /api/articles", () => {
         .get('/api/articles?topic=cats')
         .expect(200)
         .then((resp) => {
-          expect(resp._body.length).not.toBe(0);
-          resp._body.forEach(article => {
+          expect(resp.body.length).not.toBe(0);
+          resp.body.forEach(article => {
             expect(article.topic).toBe('cats');
           });
         });
@@ -189,8 +189,8 @@ describe("GET /api/articles", () => {
           .get('/api/articles?topic=notValidTopic')
           .expect(200)
           .then((resp) => {
-            expect(resp._body.length).not.toBe(0);
-            const topicsArray = resp._body.map((article => article.topic));
+            expect(resp.body.length).not.toBe(0);
+            const topicsArray = resp.body.map((article => article.topic));
             expect(topicsArray.includes('mitch')).toBe(true);
             expect(topicsArray.includes('cats')).toBe(true);
           });
@@ -200,21 +200,13 @@ describe("GET /api/articles", () => {
 
 });
 
-
-
-
-
-
-
-
-
 describe("GET /api/articles/:article_id/comments", () => {
   test("200 responds with an array of comments for the given article_id", () => {
     return request(app)
       .get('/api/articles/1/comments')
       .expect(200)
       .then((response) => {
-        const comments = response._body.comments;
+        const comments = response.body.comments;
         expect(comments.length).not.toBe(0);
         comments.forEach(comment => {
           expect(comment.hasOwnProperty('comment_id')).toBe(true);
@@ -234,7 +226,7 @@ describe("GET /api/articles/:article_id/comments", () => {
         .get('/api/articles/myid/comments')
         .expect(400)
         .then((response) => {
-          expect(response._body.error).toBe('Not a valid id');
+          expect(response.body.error).toBe('Not a valid id');
 
         });
     });
@@ -244,7 +236,7 @@ describe("GET /api/articles/:article_id/comments", () => {
       .get('/api/articles/2222/comments')
       .expect(404)
       .then((response) => {
-        expect(response._body.error).toBe('Article not found');
+        expect(response.body.error).toBe('Article not found');
 
       });
   });
@@ -255,7 +247,7 @@ describe("POST /api/articles/:article_id/comments", () => {
   test('endpoint should respond with 201 and object of posted comment', () => {
     const postObj = { username: "icellusedkars", body: "Test comment, test-comment, test, TEST COMMENT, comment" };
     return request(app).post('/api/articles/9/comments').send(postObj).expect(201).then((response) => {
-      const comment = response._body.comment;
+      const comment = response.body.comment;
       expect(typeof comment).toBe('object');
       expect(comment.author).toEqual(postObj.username);
       expect(comment.body).toEqual(postObj.body);
@@ -269,27 +261,27 @@ describe("POST /api/articles/:article_id/comments", () => {
   test("400 endpoint responds with Missing fields in the request body is username or body are missing", () => {
     const postObj = { body: "Test comment, test-comment, test, TEST COMMENT, comment" };
     return request(app).post('/api/articles/9/comments').send(postObj).expect(400).then((response) => {
-      expect(response._body.error).toBe('Missing fields in the request body');
+      expect(response.body.error).toBe('Missing fields in the request body');
     });
   });
   test("400 endpoint responds with Missing fields in the request body is username or body are missing", () => {
     const postObj = { username: 'icellusedkars' };
     return request(app).post('/api/articles/9/comments').send(postObj).expect(400).then((response) => {
-      expect(response._body.error).toBe('Missing fields in the request body');
+      expect(response.body.error).toBe('Missing fields in the request body');
     });
   });
 
   test("400 endpoint rejects with message Not a valid user input when passed a non string username", () => {
     const postObj = { body: "Test comment, test-comment, test, TEST COMMENT, comment", username: 9 };
     return request(app).post('/api/articles/9/comments').send(postObj).expect(400).then((error) => {
-      expect(error._body.error).toBe('Not a valid user input');
+      expect(error.body.error).toBe('Not a valid user input');
     });
   });
 
   test("400 endpoint rejects with message Not a valid user input when passed a non string username", () => {
     const postObj = { body: "Test comment, test-comment, test, TEST COMMENT, comment", username: "icellusedkars" };
     return request(app).post('/api/articles/999/comments').send(postObj).expect(404).then((error) => {
-      expect(error._body.error).toBe('Article not found');
+      expect(error.body.error).toBe('Article not found');
     });
   });
 });
@@ -302,7 +294,7 @@ describe('PATCH api/articles/article_id', () => {
       .send(patchObj)
       .expect(201)
       .then((resp) => {
-        const article = resp._body.article;
+        const article = resp.body.article;
         expect(typeof article).toBe('object');
         expect(article.votes).toBe(1);
         expect(article.hasOwnProperty('article_id')).toBe(true);
@@ -322,7 +314,7 @@ describe('PATCH api/articles/article_id', () => {
       .send(patchObj)
       .expect(201)
       .then((resp) => {
-        const article = resp._body.article;
+        const article = resp.body.article;
         expect(article.votes).toBe(20);
       });
   });
@@ -333,7 +325,7 @@ describe('PATCH api/articles/article_id', () => {
       .send(patchObj)
       .expect(201)
       .then((resp) => {
-        const article = resp._body.article;
+        const article = resp.body.article;
         expect(article.votes).toBe(-10);
       });
   });
@@ -345,7 +337,7 @@ describe('PATCH api/articles/article_id', () => {
         .send({})
         .expect(400)
         .then((resp) => {
-          expect(resp._body.error).toBe('Missing fields in the request body');
+          expect(resp.body.error).toBe('Missing fields in the request body');
 
         });
     });
@@ -355,7 +347,7 @@ describe('PATCH api/articles/article_id', () => {
         .send({ inc_votes: 'notanumb' })
         .expect(400)
         .then((resp) => {
-          expect(resp._body.error).toBe('Missing fields in the request body');
+          expect(resp.body.error).toBe('Missing fields in the request body');
 
         });
     });
@@ -374,7 +366,7 @@ describe("DELETE /api/comments/:comment_id", () => {
       .delete('/api/comments/notId')
       .expect(400)
       .then((resp) => {
-        expect(resp._body.error).toBe('Not a valid id');
+        expect(resp.body.error).toBe('Not a valid id');
       });
   });
 
@@ -383,7 +375,7 @@ describe("DELETE /api/comments/:comment_id", () => {
       .delete('/api/comments/888')
       .expect(404)
       .then((resp) => {
-        expect(resp._body.error).toBe('Comment not found');
+        expect(resp.body.error).toBe('Comment not found');
       });
   });
 });
@@ -395,8 +387,8 @@ describe("GET /api/users", () => {
       .expect(200)
       .then((resp) => {
         expect(Array.isArray(resp._body)).toBe(true);
-        expect(resp._body.length).toBeGreaterThan(0);
-        resp._body.forEach(user => {
+        expect(resp.body.length).toBeGreaterThan(0);
+        resp.body.forEach(user => {
           expect(typeof user).toBe('object');
           expect(user.hasOwnProperty('username')).toBe(true);
           expect(user.hasOwnProperty('name')).toBe(true);
