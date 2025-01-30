@@ -57,8 +57,12 @@
     }
   },
   "GET/api/articles": {
-    "description": "serves an array of objects sorted by created_at in descending order",
-    "queries": [],
+    "description": "serves an array of article objects according to the queries",
+    "queries": [
+      "sort_by",
+      "topic",
+      "order"
+    ],
     "exampleResponse": [
       {
         "author": "icellusedkars",

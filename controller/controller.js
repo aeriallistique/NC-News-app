@@ -1,5 +1,6 @@
 const { response } = require('express');
 const model = require('../Model/model');
+const { sort } = require('../db/data/test-data/users');
 
 module.exports.getTopics = (req, res, next) => {
   model.fetchTopics().then((result) => {
@@ -21,9 +22,8 @@ module.exports.getArticleById = (req, res, next) => {
 };
 
 module.exports.getAllArticles = (req, res, next) => {
-  const { sort_by, order } = req.query;
 
-  model.fetchAllArticles(sort_by, order).then((response) => {
+  model.fetchAllArticles(req.query).then((response) => {
     res.status(200).send(response);
   })
     .catch((err) => {
