@@ -104,8 +104,6 @@ module.exports.deleteCommentById = (id) => {
 module.exports.fetchAllUsers = () => {
   return db.query("SELECT * FROM users")
     .then((response) => {
-      if (response.rows.length > 0) {
-        return response.rows;
-      } else { return Promise.reject({ message: 'No users found', code: 404 }); }
+      return response.rows;
     });
 };
