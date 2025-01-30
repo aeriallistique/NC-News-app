@@ -6,7 +6,8 @@ const {
   formatComments,
   checkArticleExists,
   checkUserExists,
-  checkCommentExists
+  checkCommentExists,
+  sanitizeQUeryObject
 } = require("../db/seeds/utils");
 
 afterAll(() => db.end());
@@ -156,5 +157,52 @@ describe('checkCommentExists()', () => {
     return checkCommentExists(999).catch((error) => {
       expect(error.message).toBe('Comment not found');
     });
+  });
+});
+
+describe("sanitizsanitizeQUeryObject()", () => {
+  test("function returns a new object without mutating input object", () => {
+    const input = { sort_by: "votes", order: 'ASC' };
+    const output = sanitizeQUeryObject(input);
+
+    expect(typeof output).toBe('object');
+    expect(output).not.toBe(input);
+    expect(output).not.toBe(input);
+    expect(output.hasOwnProperty('sort_by')).toBe(true);
+    expect(output.hasOwnProperty('order')).toBe(true);
+    expect(output.sort_by).toBe('votes');
+    expect(output.order).toBe('ASC');
+
+  });
+  test("returns object with sort_by and order properties with default values if no properties exist on the input object", () => {
+    const input = {};
+    const output = sanitizeQUeryObject(input);
+
+    expect(typeof output).toBe('object');
+    expect(output).not.toBe(input);
+    expect(output.hasOwnProperty('sort_by')).toBe(true);
+    expect(output.hasOwnProperty('order')).toBe(true);
+    expect(output.sort_by).toBe('created_at');
+    expect(output.order).toBe('DESC');
+  });
+  test("returns object with properties of sorty_by, order and topic when topic is passed in", () => {
+    const input = { sort_by: '', order: 'ASC', topic: 'cats' };
+    const output = sanitizeQUeryObject(input);
+
+    expect(typeof output).toBe('object');
+    expect(output).not.toBe(input);
+    expect(output.hasOwnProperty('sort_by')).toBe(true);
+    expect(output.hasOwnProperty('order')).toBe(true);
+    expect(output.hasOwnProperty('topic')).toBe(true);
+    expect(output.sort_by).toBe('created_at');
+    expect(output.order).toBe('ASC');
+    expect(output.topic).toBe('cats');
+    expect(output).toEqual({ sort_by: 'created_at', order: 'ASC', topic: 'cats' });
+  });
+
+  test("returns an empty object if passed invalid sort_by and order", () => {
+    const input = { sort_by: 'notAValid', order: 'EFG', topic: 'cats' };
+    const output = sanitizeQUeryObject(input);
+    expect(Object.entries(output).length).toBe(0);
   });
 });
