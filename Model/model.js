@@ -1,7 +1,6 @@
-const format = require('pg-format');
+
 const db = require('../db/connection');
-const { checkArticleExists, checkUserExists, checkCommentExists } = require('../db/seeds/utils');
-const { response } = require('../app');
+const { checkArticleExists, checkUserExists, checkCommentExists, sanitizeQUeryObject } = require('../db/seeds/utils');
 
 
 module.exports.fetchTopics = () => {
@@ -17,8 +16,9 @@ module.exports.fetchTopics = () => {
 
 module.exports.fetchArticleById = (id) => {
   if (isNaN(id)) { return Promise.reject({ message: 'Not a valid id', code: 400 }); }
-  let sqlString = format(`SELECT * FROM articles WHERE article_id= %L`, id);
-  return db.query(sqlString)
+
+  let sqlString = `SELECT articles.*, COUNT(comments.comment_id) AS comment_count FROM articles LEFT JOIN comments ON articles.article_id=comments.article_id WHERE articles.article_id= $1 GROUP BY articles.article_id;`;
+  return db.query(sqlString, [id])
     .then((response) => {
       if (!response.rows.length) {
         return Promise.reject({ message: "Article not found", code: 404 });
@@ -29,30 +29,21 @@ module.exports.fetchArticleById = (id) => {
 };
 
 
-module.exports.fetchAllArticles = ({ topic, sort_by = 'created_at', order = 'DESC' }) => {
-  //greenlisting
-  const allowedQueries = {
-    sort_by: [
-      'author', 'title', 'article_id', 'topic', 'created_at', 'votes', 'article_img_url'],
-    order: [
-      'ASC', 'DESC'],
-    topic: ['mitch', 'cats', 'paper']
-  };
-  const isSort_by = allowedQueries.sort_by.includes(sort_by);
-  const isOder = allowedQueries.order.includes(order);
-  const isTopic = allowedQueries.topic.includes(topic);
-  //check if queries are within greenlist
-  if (!isOder || !isSort_by) { return Promise.reject({ message: 'Prohibited query parameter', code: 400 }); }
+module.exports.fetchAllArticles = (query) => {
+  const queryObject = sanitizeQUeryObject(query);
 
+  if (Object.entries(queryObject).length === 0) {
+    return Promise.reject({ message: 'Prohibited query parameter', code: 400 });
+  }
 
   let sqlString = `SELECT articles.author, articles.title, articles.article_id, articles.topic, articles.created_at, articles.votes, articles.article_img_url, COUNT(comments.comment_id) AS comment_count FROM articles LEFT JOIN comments ON articles.article_id=comments.article_id`;
 
   let queryParams = [];
-  if (isTopic) {
-    queryParams.push(topic);
+  if (queryObject.topic) {
+    queryParams.push(queryObject.topic);
     sqlString += ` WHERE articles.topic= $${queryParams.length}`;
   }
-  sqlString += ` GROUP BY articles.article_id ORDER BY ${sort_by} ${order};`;
+  sqlString += ` GROUP BY articles.article_id ORDER BY ${queryObject.sort_by} ${queryObject.order};`;
 
 
   return db.query(sqlString, queryParams).then((response) => {

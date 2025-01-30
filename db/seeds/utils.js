@@ -55,3 +55,31 @@ exports.checkCommentExists = (id) => {
       } else { return; }
     });
 };
+
+exports.sanitizeQUeryObject = (query) => {
+  const sanitizedQuery = {};
+  let sort_by = query.sort_by || "created_at";
+  let order = query.order || "DESC";
+  let topic = query.topic || null;
+
+  const allowedQueries = {
+    sort_by: [
+      'author', 'title', 'article_id', 'topic', 'created_at', 'votes', 'article_img_url'],
+    order: [
+      'ASC', 'DESC'],
+    topic: ['mitch', 'cats', 'paper']
+  };
+
+  const isSort_by = allowedQueries.sort_by.includes(sort_by);
+  const isOder = allowedQueries.order.includes(order);
+  const isTopic = allowedQueries.topic.includes(topic);
+
+  if (!isOder || !isSort_by) { return sanitizedQuery; }
+
+  if (isSort_by) { sanitizedQuery.sort_by = sort_by; }
+  if (isOder) { sanitizedQuery.order = order; }
+  if (isTopic) { sanitizedQuery.topic = topic; }
+
+
+  return sanitizedQuery;
+};
