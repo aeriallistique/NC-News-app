@@ -433,6 +433,56 @@ describe("GET /api/users/:username", () => {
         expect(error).toBe('Invalid username parameter');
       });
   });
+});
+
+describe("PATCH /api/comments/:comment_id", () => {
+  test("201 updates the votes +1 of comment based on comment_id", () => {
+    return request(app)
+      .patch('/api/comments/4')
+      .send({ inc_votes: 1 })
+      .expect(201)
+      .then(({ body: { comment } }) => {
+        expect(comment.comment_id).toBe(4);
+        expect(comment.votes).toBe(-99);
+      });
+  });
+  test("201 updates the votes -1 of comment based on comment_id", () => {
+    return request(app)
+      .patch('/api/comments/4')
+      .send({ inc_votes: -1 })
+      .expect(201)
+      .then(({ body: { comment } }) => {
+        expect(comment.comment_id).toBe(4);
+        expect(comment.votes).toBe(-101);
+      });
+  });
+  test("responds with 400 bad request when passed in strings instead of numbers", () => {
+    return request(app)
+      .patch('/api/comments/joel')
+      .send({ inc_votes: 'votes' })
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.error).toBe('Invalid request body');
+      });
+  });
+  test("responds with 400 bad request when passed in invalid vote value", () => {
+    return request(app)
+      .patch('/api/comments/4')
+      .send({ inc_votes: 22 })
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.error).toBe('Invalid request body');
+      });
+  });
+  test("responds with 404 not found when passed in non existent comment id value", () => {
+    return request(app)
+      .patch('/api/comments/444')
+      .send({ inc_votes: -1 })
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.error).toBe('No comment found');
+      });
+  });
 })
 
 

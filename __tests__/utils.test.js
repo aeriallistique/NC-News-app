@@ -7,7 +7,7 @@ const {
   checkArticleExists,
   checkUserExists,
   checkCommentExists,
-  sanitizeQUeryObject
+  sanitizeQUeryObject, isQueryValid
 } = require("../db/seeds/utils");
 
 afterAll(() => db.end());
@@ -204,5 +204,24 @@ describe("sanitizsanitizeQUeryObject()", () => {
     const input = { sort_by: 'notAValid', order: 'EFG', topic: 'cats' };
     const output = sanitizeQUeryObject(input);
     expect(Object.entries(output).length).toBe(0);
+  });
+});
+
+describe("isQueryValid()", () => {
+  test("function returns true if vote anc comment id values are valid", () => {
+    const input = { inc_votes: 1, comment_id: 4 };
+    const output = isQueryValid(input);
+    expect(typeof output).toBe('boolean');
+    expect(output).toBe(true);
+  });
+  test("function returns false when passed an invalid vote value", () => {
+    const input = { inc_votes: 3, comment_id: 4 };
+    const output = isQueryValid(input);
+    expect(output).toBe(false);
+  });
+  test("function returns an empty object when passed an invalid comment id value", () => {
+    const input = { inc_votes: -1, comment_id: 'notandID' };
+    const output = isQueryValid(input);
+    expect(output).toBe(false);
   });
 });

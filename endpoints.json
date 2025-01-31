@@ -191,5 +191,32 @@
         "avatar_url": "https://www.golenbock.com/wp-content/uploads/2015/01/placeholder-user.png"
       }
     ]
+  },
+  "GET /api/users/username": {
+    "description": "serves a single users object with provided username",
+    "queries": [],
+    "parameters": [
+      "valid username represented as a string"
+    ],
+    "exampleResponse": {
+      "username": "rogersop",
+      "name": "paul",
+      "avatar_url": "https://avatars2.githubusercontent.com/u/24394918?s=400&v=4"
+    }
+  },
+  "PATCH /api/comments/:comment_id": {
+    "description": "updates the votes property of a single comment based on comment id responds with updated comment object",
+    "queries": [],
+    "parameters": [
+      "valid commment id and vote values as a number in this example vote=1 comment_id=4"
+    ],
+    "exampleResponse": {
+      "comment_id": 4,
+      "body": " I carry a log — yes. Is it funny to you? It is not to me.",
+      "article_id": 1,
+      "author": "icellusedkars",
+      "votes": -99,
+      "created_at": "2020-02-23T12:01:00.000Z"
+    }
   }
 }
