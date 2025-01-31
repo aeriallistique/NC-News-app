@@ -1,4 +1,4 @@
-# Andi's News API
+## Andi's News API
 
 This project contains an API that fetches articles, comments, topics or users.It allows users to vote on a comment or article. The full description of this API is available in `endpoints.json` or [here](https://andis-news-app.onrender.com/api)
 Live demos is [here](https://andis-news-app.onrender.com/)
