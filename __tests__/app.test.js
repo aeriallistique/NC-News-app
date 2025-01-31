@@ -397,6 +397,42 @@ describe("GET /api/users", () => {
 
       });
   });
+});
+
+describe("GET /api/users/:username", () => {
+  test("200 responds with a user object based on username provided", () => {
+    return request(app)
+      .get('/api/users/rogersop')
+      .expect(200)
+      .then((resp) => {
+        const user = resp.body.user;
+        expect(typeof user).toBe('object');
+        expect(user.hasOwnProperty('username')).toBe(true);
+        expect(user.hasOwnProperty('name')).toBe(true);
+        expect(user.hasOwnProperty('avatar_url')).toBe(true);
+        expect(user.username).toBe('rogersop');
+        expect(user.name).toBe('paul');
+        expect(user.avatar_url).toBe('https://avatars2.githubusercontent.com/u/24394918?s=400&v=4');
+      });
+  });
+  test('404 not found, responds with if passed in a non existent but valid username', () => {
+    return request(app)
+      .get('/api/users/leonardo')
+      .expect(404)
+      .then((resp) => {
+        const { error } = resp.body;
+        expect(error).toBe('User not found');
+      });
+  });
+  test('400 invalid username parameter, responds with if passed in a number instead of a string', () => {
+    return request(app)
+      .get('/api/users/234')
+      .expect(400)
+      .then((resp) => {
+        const { error } = resp.body;
+        expect(error).toBe('Invalid username parameter');
+      });
+  });
 })
 
 

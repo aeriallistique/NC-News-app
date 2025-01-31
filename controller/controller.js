@@ -79,3 +79,13 @@ module.exports.getUsers = (req, res, next) => {
       next(err)
     );
 };
+
+module.exports.getUserByUsername = async (req, res, next) => {
+  try {
+    const { username } = req.params;
+    const user = await model.fetchUserByUsername(username);
+    res.status(200).send({ user: user });
+  } catch (error) {
+    next(error);
+  }
+};

@@ -107,3 +107,15 @@ module.exports.fetchAllUsers = () => {
       return response.rows;
     });
 };
+
+module.exports.fetchUserByUsername = async (username) => {
+  if (isNaN(username)) {
+    const { rows: users, rowCount } = await db.query("SELECT * FROM users WHERE users.username= $1", [username]);
+    if (rowCount === 0) {
+      return Promise.reject({ message: 'User not found', code: 404 });
+    } else { return users[0]; }
+  } else {
+    return Promise.reject({ message: 'Invalid username parameter', code: 400 });
+  }
+
+};
