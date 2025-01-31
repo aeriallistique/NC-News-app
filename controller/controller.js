@@ -89,3 +89,15 @@ module.exports.getUserByUsername = async (req, res, next) => {
     next(error);
   }
 };
+
+module.exports.updateCommentById = async (req, res, next) => {
+  try {
+    const { inc_votes } = req.body;
+    const { comment_id } = req.params;
+    const updatedComment = await model.updateCommentById({ inc_votes, comment_id });
+    res.status(201).send({ comment: updatedComment });
+
+  } catch (error) {
+    next(error);
+  }
+};

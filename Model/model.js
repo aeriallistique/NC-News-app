@@ -1,6 +1,7 @@
 
+const { all } = require('../app');
 const db = require('../db/connection');
-const { checkArticleExists, checkUserExists, checkCommentExists, sanitizeQUeryObject } = require('../db/seeds/utils');
+const { checkArticleExists, checkUserExists, checkCommentExists, sanitizeQUeryObject, isQueryValid } = require('../db/seeds/utils');
 
 
 module.exports.fetchTopics = () => {
@@ -118,4 +119,15 @@ module.exports.fetchUserByUsername = async (username) => {
     return Promise.reject({ message: 'Invalid username parameter', code: 400 });
   }
 
+};
+
+module.exports.updateCommentById = async (query) => {
+  if (isQueryValid(query)) {
+    const values = [query.inc_votes, query.comment_id];
+    const { rows, rowCount } = await db.query("UPDATE comments SET votes= votes+ $1 WHERE comments.comment_id=$2 RETURNING *", values);
+    if (rowCount === 0) { return Promise.reject({ message: 'No comment found', code: 404 }); }
+    return rows[0];
+  } else {
+    return Promise.reject({ message: 'Invalid request body', code: 400 });
+  }
 };

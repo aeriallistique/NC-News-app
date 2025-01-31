@@ -83,3 +83,14 @@ exports.sanitizeQUeryObject = (query) => {
 
   return sanitizedQuery;
 };
+
+exports.isQueryValid = (query) => {
+  let isValid = false;
+  const allowedVotesValues = [1, -1];
+  if (!isNaN(query.inc_votes)
+    && !isNaN(query.comment_id)
+    && allowedVotesValues.includes(query.inc_votes)) {
+    isValid = true;
+  }
+  return isValid;
+};
