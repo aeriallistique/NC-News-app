@@ -1,7 +1,7 @@
 
 const { all } = require('../app');
 const db = require('../db/connection');
-const { checkArticleExists, checkUserExists, checkCommentExists, sanitizeQUeryObject, isQueryValid } = require('../db/seeds/utils');
+const { checkArticleExists, checkUserExists, checkCommentExists, sanitizeQUeryObject, isQueryValid, isPostObjectValid } = require('../db/seeds/utils');
 
 
 module.exports.fetchTopics = () => {
@@ -129,5 +129,17 @@ module.exports.updateCommentById = async (query) => {
     return rows[0];
   } else {
     return Promise.reject({ message: 'Invalid request body', code: 400 });
+  }
+};
+
+module.exports.createArticle = async (query) => {
+  const validQuery = await isPostObjectValid(query);
+  if (validQuery === true) {
+    const values = [query.author, query.title, query.topic, query.body, query.article_img_url || null];
+    const newArticle = await db.query("INSERT INTO articles (author, title, topic, body, article_img_url) VALUES($1, $2, $3, $4, COALESCE($5, 'https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700')) RETURNING *, 0 AS comment_count", values);
+
+    return newArticle.rows[0];
+  } else {
+    return Promise.reject(validQuery);
   }
 };

@@ -96,7 +96,15 @@ module.exports.updateCommentById = async (req, res, next) => {
     const { comment_id } = req.params;
     const updatedComment = await model.updateCommentById({ inc_votes, comment_id });
     res.status(201).send({ comment: updatedComment });
+  } catch (error) {
+    next(error);
+  }
+};
 
+module.exports.postArticle = async (req, res, next) => {
+  try {
+    const newArticle = await model.createArticle(req.body);
+    res.status(201).send({ article: newArticle });
   } catch (error) {
     next(error);
   }

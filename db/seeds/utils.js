@@ -30,7 +30,7 @@ exports.checkArticleExists = (id) => {
     .then((response) => {
       if (response.rows.length === 0) {
         return Promise.reject({ message: 'Article not found', code: 404 });
-      } else { return; }
+      } else { return true; }
     });
 };
 
@@ -41,7 +41,7 @@ exports.checkUserExists = (user) => {
     .then((response) => {
       if (response.rows.length === 0) {
         return Promise.reject({ message: 'User not found', code: 404 });
-      } else { return; }
+      } else { return true; }
     });
 };
 
@@ -52,7 +52,18 @@ exports.checkCommentExists = (id) => {
     .then((response) => {
       if (response.rows.length === 0) {
         return Promise.reject({ message: 'Comment not found', code: 404 });
-      } else { return; }
+      } else { return true; }
+    });
+};
+
+exports.checkTopicExists = (topic) => {
+  if (typeof topic !== 'string') { return Promise.reject({ message: 'Not a valid topic input', code: 400 }); }
+  return db
+    .query("SELECT * FROM topics WHERE topics.slug = $1;", [topic])
+    .then((response) => {
+      if (response.rowCount === 0) {
+        return Promise.reject({ message: 'Topic not found', code: 404 });
+      } else { return true; }
     });
 };
 
@@ -93,4 +104,21 @@ exports.isQueryValid = (query) => {
     isValid = true;
   }
   return isValid;
+};
+
+exports.isPostObjectValid = async (query) => {
+  let isQueryValid = false;
+  try {
+    const { author, title, body, topic, article_img_url } = query;
+    const isTitle = typeof title === 'string';
+    const isBody = typeof body === 'string';
+    const isArticle_img_url = typeof article_img_url === 'string';
+    const isUser = await this.checkUserExists(author);
+    const isTopic = await this.checkTopicExists(topic);
+    if (isUser, isTopic, isTitle, isBody, isArticle_img_url) { isQueryValid = true; };
+
+    return isQueryValid;
+  } catch (error) {
+    return error;
+  }
 };

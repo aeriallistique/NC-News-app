@@ -7,7 +7,8 @@ const {
   checkArticleExists,
   checkUserExists,
   checkCommentExists,
-  sanitizeQUeryObject, isQueryValid
+  sanitizeQUeryObject, isQueryValid,
+  isPostObjectValid, checkTopicExists
 } = require("../db/seeds/utils");
 
 afterAll(() => db.end());
@@ -223,5 +224,67 @@ describe("isQueryValid()", () => {
     const input = { inc_votes: -1, comment_id: 'notandID' };
     const output = isQueryValid(input);
     expect(output).toBe(false);
+  });
+});
+describe("checkTopicExists()", () => {
+  test("function returns true if topic exists", () => {
+    return checkTopicExists('cats').then((result) => {
+      expect(result).toBe(true);
+    });
+  });
+  test("function returns error message 'Topic not found' if topic doesn't exist", () => {
+    return checkTopicExists('cat').catch((err) => {
+      expect(err.message).toBe('Topic not found');
+    });
+  });
+  test("function returns error message not a valid topic input if passed it a non string value", () => {
+    return checkTopicExists(9).catch((err) => {
+      expect(err.message).toBe('Not a valid topic input');
+    });
+  });
+});
+
+describe("isPostObjectValid() will either return true OR error message ", () => {
+  test("function returns true if an user/author and topic exist and all properties are strings", () => {
+    const queryObj = {
+      title: "Manchester UK a short story",
+      topic: "cats",
+      author: "rogersop",
+      body: "Manchester is a great city with ONE great football team and also Man city.!",
+      article_img_url:
+        "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+    };
+    return isPostObjectValid(queryObj).then((result) => {
+      expect(typeof result).toBe('boolean');
+      expect(result).toBe(true);
+    });
+  });
+  test("function returns 'Topic not found' error message is topic does not exist", () => {
+    const queryObj = {
+      title: "Manchester UK a short story",
+      topic: "cat",
+      author: "rogersop",
+      body: "Manchester is a great city with ONE great football team and also Man city.!",
+      article_img_url:
+        "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+    };
+    return isPostObjectValid(queryObj).catch((err) => {
+      expect(err.message).toBe('Topic not found');
+      expect(err.code).toBe(404);
+    });
+  });
+  test("function returns 'User not found' error message is author does not exist", () => {
+    const queryObj = {
+      title: "Manchester UK a short story",
+      topic: "cats",
+      author: "roger",
+      body: "Manchester is a great city with ONE great football team and also Man city.!",
+      article_img_url:
+        "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+    };
+    return isPostObjectValid(queryObj).catch((err) => {
+      expect(err.message).toBe('User not found');
+      expect(err.code).toBe(404);
+    });
   });
 });

@@ -483,6 +483,71 @@ describe("PATCH /api/comments/:comment_id", () => {
         expect(body.error).toBe('No comment found');
       });
   });
-})
+});
 
+describe("POST /api/arcticle", () => {
+  test("endpoint posts new article and returns new article object", () => {
+    const postObj = {
+      title: "Manchester UK a short story",
+      topic: "cats",
+      author: "rogersop",
+      body: "Manchester is a great city with ONE great football team and also Man city.!",
+      article_img_url:
+        "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+    };
+    return request(app)
+      .post('/api/articles')
+      .send(postObj)
+      .expect(201)
+      .then(({ body: { article } }) => {
+        expect(article.hasOwnProperty('article_id')).toBe(true);
+        expect(article.hasOwnProperty('title')).toBe(true);
+        expect(article.title).toEqual(postObj.title);
+        expect(article.hasOwnProperty('body')).toBe(true);
+        expect(article.body).toEqual(postObj.body);
+        expect(article.hasOwnProperty('topic')).toBe(true);
+        expect(article.topic).toEqual(postObj.topic);
+        expect(article.hasOwnProperty('author')).toBe(true);
+        expect(article.author).toEqual(postObj.author);
+        expect(article.hasOwnProperty('created_at')).toBe(true);
+        expect(article.hasOwnProperty('article_img_url')).toBe(true);
+        expect(article.hasOwnProperty('comment_count')).toBe(true);
+        expect(article.article_img_url).toEqual(postObj.article_img_url);
+      });
+  });
+  test("endpoint returns 'Topic not found' error message when passed inexistent topic query value", () => {
+    const postObj = {
+      title: "Manchester UK a short story",
+      topic: "cat",
+      author: "rogersop",
+      body: "Manchester is a great city with ONE great football team and also Man city.!",
+      article_img_url:
+        "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+    };
+    return request(app)
+      .post('/api/articles')
+      .send(postObj)
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.error).toBe('Topic not found');
+      });
+  });
+  test("endpoint returns 'User not found' error message when passed inexistent user query value", () => {
+    const postObj = {
+      title: "Manchester UK a short story",
+      topic: "cats",
+      author: "roger",
+      body: "Manchester is a great city with ONE great football team and also Man city.!",
+      article_img_url:
+        "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+    };
+    return request(app)
+      .post('/api/articles')
+      .send(postObj)
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.error).toBe('User not found');
+      });
+  });
+})
 
