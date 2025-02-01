@@ -486,7 +486,7 @@ describe("PATCH /api/comments/:comment_id", () => {
 });
 
 describe("POST /api/arcticle", () => {
-  test("endpoint posts new article and returns new article object", () => {
+  test("201 endpoint posts new article and returns new article object", () => {
     const postObj = {
       title: "Manchester UK a short story",
       topic: "cats",
@@ -515,7 +515,7 @@ describe("POST /api/arcticle", () => {
         expect(article.article_img_url).toEqual(postObj.article_img_url);
       });
   });
-  test("endpoint returns 'Topic not found' error message when passed inexistent topic query value", () => {
+  test("404 endpoint returns 'Topic not found' error message when passed inexistent topic query value", () => {
     const postObj = {
       title: "Manchester UK a short story",
       topic: "cat",
@@ -532,7 +532,7 @@ describe("POST /api/arcticle", () => {
         expect(body.error).toBe('Topic not found');
       });
   });
-  test("endpoint returns 'User not found' error message when passed inexistent user query value", () => {
+  test("404 endpoint returns 'User not found' error message when passed inexistent user query value", () => {
     const postObj = {
       title: "Manchester UK a short story",
       topic: "cats",
@@ -547,6 +547,36 @@ describe("POST /api/arcticle", () => {
       .expect(404)
       .then(({ body }) => {
         expect(body.error).toBe('User not found');
+      });
+  });
+  test("201 endpoint returns a default value for article_img_url is none is passed", () => {
+    const postObj = {
+      title: "Manchester UK a short story",
+      topic: "cats",
+      author: "rogersop",
+      body: "Manchester is a great city with ONE great football team and also Man city.!"
+    };
+    return request(app)
+      .post('/api/articles')
+      .send(postObj)
+      .expect(201)
+      .then(({ body: { article: { article_img_url } } }) => {
+        expect(article_img_url).toEqual("https://images.pexels.com/photos/1/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700");
+      });
+  });
+  test("400 endpoint returns an error message if post object is missing a key", () => {
+    const postObj = {
+      topic: "cats",
+      author: "rogersop",
+      body: "Manchester is a great city with ONE great football team and also Man city.!",
+      article_img_url: "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+    };
+    return request(app)
+      .post('/api/articles')
+      .send(postObj)
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.error).toBe('Missing key in post object');
       });
   });
 })
