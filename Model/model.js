@@ -133,6 +133,8 @@ module.exports.updateCommentById = async (query) => {
 };
 
 module.exports.createArticle = async (query) => {
+
+
   const validQuery = await isPostObjectValid(query);
   if (validQuery === true) {
     const values = [query.author, query.title, query.topic, query.body, query.article_img_url || null];

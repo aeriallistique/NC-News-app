@@ -107,6 +107,9 @@ exports.isQueryValid = (query) => {
 };
 
 exports.isPostObjectValid = async (query) => {
+  if (!query.title || !query.body) { return Promise.reject({ message: 'Missing key in post object', code: 400 }); }
+  if (!query.article_img_url) { query.article_img_url = "https://images.pexels.com/photos/1/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700"; }
+
   let isQueryValid = false;
   try {
     const { author, title, body, topic, article_img_url } = query;
