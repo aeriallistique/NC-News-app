@@ -22,7 +22,6 @@ module.exports.getArticleById = (req, res, next) => {
 };
 
 module.exports.getAllArticles = (req, res, next) => {
-
   model.fetchAllArticles(req.query).then((response) => {
     res.status(200).send(response);
   })

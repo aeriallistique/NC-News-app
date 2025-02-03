@@ -579,5 +579,17 @@ describe("POST /api/arcticle", () => {
         expect(body.error).toBe('Missing key in post object');
       });
   });
+});
+
+describe.only("GET articles with pagination ", () => {
+  test("endpoint responds with an array of the first 5 articles in db", () => {
+    return request(app)
+      .get('/api/articles?limit=5')
+      .expect(200)
+      .then((resp) => {
+        expect(resp.body.length).toBe(5);
+
+      });
+  });
 })
 

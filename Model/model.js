@@ -44,8 +44,13 @@ module.exports.fetchAllArticles = (query) => {
     queryParams.push(queryObject.topic);
     sqlString += ` WHERE articles.topic= $${queryParams.length}`;
   }
-  sqlString += ` GROUP BY articles.article_id ORDER BY ${queryObject.sort_by} ${queryObject.order};`;
+  sqlString += ` GROUP BY articles.article_id ORDER BY ${queryObject.sort_by} ${queryObject.order}`;
 
+  if (queryObject.limit) {
+    queryParams.push(queryObject.limit);
+    sqlString += ` LIMIT $${queryParams.length};`;
+
+  }
 
   return db.query(sqlString, queryParams).then((response) => {
     if (response.rowCount === 0) {
