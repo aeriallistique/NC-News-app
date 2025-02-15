@@ -581,14 +581,17 @@ describe("POST /api/arcticle", () => {
   });
 });
 
-describe("GET articles with pagination ", () => {
+describe.only("GET articles with pagination ", () => {
   test("endpoint responds with an array of the first 5 articles in db", () => {
     return request(app)
       .get('/api/articles?limit=5')
       .expect(200)
       .then((resp) => {
-        expect(resp.body.length).toBe(5);
-        // KEEPT TESTING FOR LIMIT AND PAGE / OFFSET
+        const response = resp.body;
+        expect(response.length).toBe(5);
+        expect(response[0].author).toEqual('icellusedkars');
+        expect(response[response.length - 1].author).toEqual('butter_bridge');
+
       });
   });
 })

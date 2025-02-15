@@ -72,7 +72,8 @@ exports.sanitizeQUeryObject = (query) => {
   let sort_by = query.sort_by || "created_at";
   let order = query.order || "DESC";
   let topic = query.topic || null;
-  let limit = query.limit || 10;
+  let limit = query.limit || 0;
+  let page = query.p || 0;
 
   const allowedQueries = {
     sort_by: [
@@ -86,6 +87,7 @@ exports.sanitizeQUeryObject = (query) => {
   const isOder = allowedQueries.order.includes(order);
   const isTopic = allowedQueries.topic.includes(topic);
   const isLimit = /^\d+$/.test(limit);
+  const isPage = /^\d+$/.test(page);
 
 
   if (!isOder || !isSort_by || !isLimit) { return sanitizedQuery; }
@@ -94,6 +96,7 @@ exports.sanitizeQUeryObject = (query) => {
   if (isOder) { sanitizedQuery.order = order; }
   if (isTopic) { sanitizedQuery.topic = topic; }
   if (isLimit) { sanitizedQuery.limit = limit; }
+  if (isPage) { sanitizedQuery.page = page; }
 
 
   return sanitizedQuery;
