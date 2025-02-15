@@ -52,6 +52,7 @@ module.exports.fetchAllArticles = (query) => {
 
   }
 
+
   return db.query(sqlString, queryParams).then((response) => {
     if (response.rowCount === 0) {
       return Promise.reject({ message: "No articles found." });
