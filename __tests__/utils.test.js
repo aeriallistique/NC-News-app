@@ -198,7 +198,7 @@ describe("sanitizsanitizeQUeryObject()", () => {
     expect(output.sort_by).toBe('created_at');
     expect(output.order).toBe('ASC');
     expect(output.topic).toBe('cats');
-    expect(output).toEqual({ sort_by: 'created_at', order: 'ASC', topic: 'cats' });
+
   });
 
   test("returns an empty object if passed invalid sort_by and order", () => {

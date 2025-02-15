@@ -581,14 +581,14 @@ describe("POST /api/arcticle", () => {
   });
 });
 
-describe.only("GET articles with pagination ", () => {
+describe("GET articles with pagination ", () => {
   test("endpoint responds with an array of the first 5 articles in db", () => {
     return request(app)
       .get('/api/articles?limit=5')
       .expect(200)
       .then((resp) => {
         expect(resp.body.length).toBe(5);
-
+        // KEEPT TESTING FOR LIMIT AND PAGE / OFFSET
       });
   });
 })
