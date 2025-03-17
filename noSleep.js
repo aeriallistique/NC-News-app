@@ -6,4 +6,5 @@ const noSleep = () => setInterval(() => {
       console.log({ data });
     });
 }, 600000);
-module.exports = noSleep;
+
+noSleep();
