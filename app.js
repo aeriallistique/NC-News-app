@@ -1,4 +1,5 @@
 const express = require('express');
+const noSleep = require('./noSleep');
 const app = express();
 const apiRouter = require('./routes/api-router');
 const cors = require('cors');
@@ -27,5 +28,7 @@ app.use((err, req, res, next) => {
 
   res.status(500).send({ msg: " Internal server error" });
 });
+
+noSleep();
 
 module.exports = app;
