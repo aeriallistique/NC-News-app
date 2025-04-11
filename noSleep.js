@@ -5,6 +5,6 @@ const noSleep = () => setInterval(() => {
     .then(({ data }) => {
       console.log({ data });
     });
-}, 600000);
+}, 120000);
 
 noSleep();
